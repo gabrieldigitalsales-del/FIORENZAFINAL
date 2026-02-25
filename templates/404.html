@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4" style="max-width:760px;">
+  <div class="fz-card p-4 text-center" data-aos="fade-up">
+    <div class="display-4 fw-bold">404</div>
+    <div class="fz-muted">Página não encontrada.</div>
+    <a class="btn btn-fz mt-3" href="{{ url_for('index') }}">Voltar para Home</a>
+  </div>
+</div>
+{% endblock %}
