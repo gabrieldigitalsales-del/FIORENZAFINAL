@@ -721,5 +721,6 @@ if __name__ == "__main__":
             db.session.add(SiteConfig(site_name="Fiorenza Pizzaria e Restaurante", logo_url="/static/images/logo.png"))
             db.session.commit()
 
-    if __name__ == "__main__":
-    app.run(debug=True)
+if __name__ == "__main__":
+    app.run()
+
