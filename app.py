@@ -720,4 +720,6 @@ if __name__ == "__main__":
         if not SiteConfig.query.first():
             db.session.add(SiteConfig(site_name="Fiorenza Pizzaria e Restaurante", logo_url="/static/images/logo.png"))
             db.session.commit()
-    app.run(host="0.0.0.0", port=5000, debug=True)
+
+    if __name__ == "__main__":
+    app.run(debug=True)
