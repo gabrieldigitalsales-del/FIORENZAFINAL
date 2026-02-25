@@ -3,6 +3,7 @@ import os
 import uuid
 import stripe
 from functools import wraps
+from datetime import datetime
 
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -27,9 +28,38 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
 
+    # ✅ Render FREE: se não houver BASE_URL nas env vars, usa a URL do Render
+    # (evita success_url/cancel_url virarem "None/checkout/success" e estourar erro)
+    app.config["BASE_URL"] = (app.config.get("BASE_URL") or os.getenv("BASE_URL") or "https://fiorenza.onrender.com").rstrip("/")
+
     os.makedirs(app.config.get("UPLOAD_FOLDER", "static/uploads"), exist_ok=True)
 
     db.init_app(app)
+
+    # ✅ Cria tabelas e garante SiteConfig logo ao iniciar (resolve 500: no such table)
+    with app.app_context():
+        db.create_all()
+
+        cfg = SiteConfig.query.first()
+        if not cfg:
+            cfg = SiteConfig(
+                site_name="Fiorenza Pizzaria e Restaurante",
+                whatsapp="5531999999999",
+                telefone="(31) 99999-9999",
+                endereco_linha1="Av Getúlio Vargas, 411 - Centro",
+                endereco_linha2="Sete Lagoas - MG",
+                frete_gratis=True,
+                entrega_cidade="Sete Lagoas - MG",
+                logo_url="/static/images/logo.png",
+                created_at=datetime.utcnow(),
+            )
+            db.session.add(cfg)
+            db.session.commit()
+        else:
+            # garante logo_url para não quebrar a navbar
+            if not getattr(cfg, "logo_url", None):
+                cfg.logo_url = "/static/images/logo.png"
+                db.session.commit()
 
     # Stripe init
     if app.config.get("STRIPE_SECRET_KEY"):
@@ -39,8 +69,11 @@ def create_app():
     def get_site_config():
         cfg = SiteConfig.query.first()
         if not cfg:
-            cfg = SiteConfig(site_name="Fiorenza Pizzaria e Restaurante")
+            cfg = SiteConfig(site_name="Fiorenza Pizzaria e Restaurante", logo_url="/static/images/logo.png")
             db.session.add(cfg)
+            db.session.commit()
+        if not getattr(cfg, "logo_url", None):
+            cfg.logo_url = "/static/images/logo.png"
             db.session.commit()
         return cfg
 
@@ -330,7 +363,6 @@ def create_app():
 
         uid = session.get("user_id")
 
-        # ✅ status inicial:
         initial_status = "aguardando_pagamento" if forma_pagamento == "stripe" else "novo"
 
         pedido = Pedido(
@@ -348,7 +380,6 @@ def create_app():
         db.session.add(pedido)
         db.session.commit()
 
-        # Stripe checkout (✅ NÃO marca pago aqui!)
         if forma_pagamento == "stripe":
             if not app.config.get("STRIPE_SECRET_KEY"):
                 flash("Stripe não configurado ainda. Escolha outra forma de pagamento.", "danger")
@@ -368,8 +399,9 @@ def create_app():
                     "quantity": int(it["qtd"])
                 })
 
-            success_url = f"{app.config.get('BASE_URL')}{url_for('checkout_success')}?session_id={{CHECKOUT_SESSION_ID}}"
-            cancel_url = f"{app.config.get('BASE_URL')}{url_for('checkout_cancel')}?pedido_id={pedido.id}"
+            base_url = (app.config.get("BASE_URL") or "https://fiorenza.onrender.com").rstrip("/")
+            success_url = f"{base_url}{url_for('checkout_success')}?session_id={{CHECKOUT_SESSION_ID}}"
+            cancel_url = f"{base_url}{url_for('checkout_cancel')}?pedido_id={pedido.id}"
 
             checkout_session = stripe.checkout.Session.create(
                 mode="payment",
@@ -384,7 +416,6 @@ def create_app():
 
             return redirect(checkout_session.url)
 
-        # Pagamento na entrega
         session["cart"] = {}
         session.modified = True
 
@@ -400,8 +431,6 @@ def create_app():
 
     @app.route("/checkout/success")
     def checkout_success():
-        # ✅ Aqui NÃO marcamos como pago.
-        # A confirmação verdadeira vem do WEBHOOK.
         session_id = request.args.get("session_id", "")
         if not session_id:
             abort(400)
@@ -410,7 +439,6 @@ def create_app():
         if not pedido:
             abort(404)
 
-        # limpa carrinho mesmo assim
         session["cart"] = {}
         session.modified = True
 
@@ -428,7 +456,7 @@ def create_app():
         flash("Pagamento cancelado. Você pode tentar novamente.", "info")
         return redirect(url_for("checkout"))
 
-    # ---------- ✅ Stripe Webhook ----------
+    # ---------- Stripe Webhook ----------
     @app.route("/webhook/stripe", methods=["POST"])
     def stripe_webhook():
         payload = request.get_data(as_text=False)
@@ -436,7 +464,6 @@ def create_app():
 
         webhook_secret = app.config.get("STRIPE_WEBHOOK_SECRET", "")
         if not webhook_secret:
-            # Sem secret, não dá pra validar assinatura
             return ("Webhook secret não configurado", 400)
 
         try:
@@ -450,12 +477,10 @@ def create_app():
         except stripe.error.SignatureVerificationError:
             return ("Assinatura inválida", 400)
 
-        # Evento principal: pagamento finalizado
         if event["type"] == "checkout.session.completed":
             session_obj = event["data"]["object"]
             pedido_id = None
 
-            # tenta via metadata
             meta = session_obj.get("metadata") or {}
             if meta.get("pedido_id"):
                 try:
@@ -463,7 +488,6 @@ def create_app():
                 except Exception:
                     pedido_id = None
 
-            # fallback: procurar pelo stripe_session_id
             stripe_session_id = session_obj.get("id")
 
             pedido = None
@@ -715,13 +739,5 @@ def create_app():
 app = create_app()
 
 if __name__ == "__main__":
-    with app.app_context():
-        db.create_all()
-        if not SiteConfig.query.first():
-            db.session.add(SiteConfig(site_name="Fiorenza Pizzaria e Restaurante", logo_url="/static/images/logo.png"))
-            db.session.commit()
-
-    if __name__ == "__main__":
-        app.run()
-
-
+    # ✅ Rodar localmente (Render usa gunicorn)
+    app.run(host="0.0.0.0", port=5000, debug=True)
