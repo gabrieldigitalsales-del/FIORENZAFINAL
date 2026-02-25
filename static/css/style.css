@@ -9,7 +9,7 @@
   --fz-radius:18px;
 }
 
-/* ✅ Garante que nada cria “margem” e o banner pega 100% */
+/* ✅ Reset básico */
 html, body{
   width:100%;
   height:100%;
@@ -23,15 +23,21 @@ body{
               var(--fz-bg);
 }
 
+/* ✅ Imagens nunca estouram */
+img{
+  max-width: 100%;
+  height: auto;
+}
+
 /* =========================
-   ✅ HERO FULL WIDTH (NOVO)
+   ✅ HERO FULL WIDTH
    ========================= */
 
 /* Você vai passar a imagem pelo HTML:
    style="--hero-bg: url('...')" */
 .hero-full{
   width: 100vw;
-  min-height: 72vh;        /* ajuste se quiser mais alto */
+  min-height: 72vh;
   position: relative;
   margin: 0;
   padding: 0;
@@ -51,7 +57,6 @@ body{
 .hero-overlay{
   position: absolute;
   inset: 0;
-  /* leve transparência (não some com a imagem) */
   background: rgba(0,0,0,0.45);
 }
 
@@ -91,6 +96,9 @@ body{
   flex-wrap: wrap;
 }
 
+/* ⚠️ Evita conflito com Bootstrap .btn-primary
+   Use suas classes próprias (se puder) no HTML: .fz-btn-primary / .fz-btn-outline
+   Mas mantendo as suas aqui, ok. */
 .btn-primary{
   background: var(--fz-red);
   color: #fff;
@@ -120,7 +128,7 @@ body{
 }
 
 /* =========================
-   SEU CSS ORIGINAL
+   NAVBAR
    ========================= */
 
 .fz-navbar{
@@ -164,7 +172,14 @@ body{
 }
 .btn-fz:hover{ background: var(--fz-red-2); color:#fff; }
 
-.fz-main{ min-height: calc(100vh - 150px); padding-bottom: 30px; }
+.fz-main{
+  min-height: calc(100vh - 150px);
+  padding-bottom: 30px;
+}
+
+/* =========================
+   HERO (CARD) / BANNER
+   ========================= */
 
 .fz-hero{
   border-radius: 26px;
@@ -183,9 +198,67 @@ body{
               rgba(0,0,0,.12);
 }
 
-.fz-hero .content{ position: relative; z-index: 2; padding: 46px 36px; color:#fff; }
+.fz-hero .content{
+  position: relative;
+  z-index: 2;
+  padding: 46px 36px;
+  color:#fff;
+}
 .fz-hero h1{ font-weight: 900; letter-spacing: .4px; }
 .fz-hero p{ color: rgba(255,255,255,.88); max-width: 720px; }
+
+.fz-script{
+  font-family: 'Great Vibes', cursive;
+  letter-spacing: 1px;
+}
+
+.fz-banner-text{
+  font-family: 'Great Vibes', cursive;
+  font-size: 3rem;
+  line-height: 1.1;
+}
+
+/* ===== FIX BANNER MOBILE (não ultrapassar) ===== */
+.fz-hero,
+.hero-banner,
+.fz-banner,
+.banner-hero{
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  border-radius: 24px;
+}
+
+.fz-hero,
+.hero-banner,
+.fz-banner,
+.banner-hero{
+  min-height: 220px;
+  height: clamp(220px, 40vw, 520px);
+  background-size: cover;
+  background-position: center;
+}
+
+.fz-banner-text,
+.hero-title,
+.banner-title{
+  font-size: clamp(26px, 6vw, 56px);
+  line-height: 1.05;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  margin: 0;
+}
+
+.fz-hero * ,
+.hero-banner * ,
+.fz-banner * ,
+.banner-hero *{
+  max-width: 100%;
+}
+
+/* =========================
+   CARDS / PRODUTOS
+   ========================= */
 
 .fz-card{
   background: var(--fz-card);
@@ -193,12 +266,6 @@ body{
   border: 1px solid rgba(15,17,21,.06);
   box-shadow: 0 16px 30px rgba(17,24,39,.08);
   overflow: hidden;
-}
-
-.fz-product-img{
-  width:100%;
-  height: 170px;
-  object-fit: cover;
 }
 
 .fz-product-body{
@@ -224,7 +291,67 @@ body{
   font-size: 12px;
 }
 
-/* Floating buttons */
+/* ✅ UMA regra só pra imagem de produto (remove duplicidade) */
+.fz-product-img,
+.fz-product-card img{
+  width: 100%;
+  height: 160px;          /* equilíbrio bom p/ mobile e desktop */
+  object-fit: cover;
+  display: block;
+}
+
+.fz-product-card{
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+/* =========================
+   GRID DE PRODUTOS (RESPONSIVO DE VERDADE)
+   ========================= */
+
+/* Base (desktop intermediário) */
+.fz-products-grid{
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+/* Celulares pequenos: 1 coluna */
+@media (max-width: 420px){
+  .fz-products-grid{
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+/* Celular normal: 2 colunas (fica bonito e legível) */
+@media (min-width: 421px) and (max-width: 767px){
+  .fz-products-grid{
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+}
+
+/* Tablet: 3 colunas */
+@media (min-width: 768px) and (max-width: 991px){
+  .fz-products-grid{
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+  }
+}
+
+/* PC */
+@media (min-width: 992px){
+  .fz-products-grid{
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 16px;
+  }
+}
+
+/* =========================
+   FLOATING BUTTONS
+   ========================= */
+
 .fz-fab-cart, .fz-fab-whats{
   position: fixed;
   bottom: 20px;
@@ -269,7 +396,10 @@ body{
   text-decoration: none;
 }
 
-/* Cart drawer */
+/* =========================
+   CART DRAWER
+   ========================= */
+
 .fz-cart-backdrop{
   position: fixed;
   inset: 0;
@@ -334,12 +464,20 @@ body{
   background: rgba(255,255,255,.03);
 }
 
+/* =========================
+   FOOTER
+   ========================= */
+
 .fz-footer{
   padding: 16px 0;
   border-top: 1px solid rgba(17,24,39,.08);
   background: rgba(255,255,255,.55);
   backdrop-filter: blur(8px);
 }
+
+/* =========================
+   HERO CUSTOM
+   ========================= */
 
 .fz-hero-custom{
   min-height: 420px;
@@ -356,103 +494,138 @@ body{
   filter: drop-shadow(0 0 15px rgba(255,215,0,.3));
 }
 
-/* GRID de produtos: 3 no celular, 5 no PC */
-.fz-products-grid{
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
-}
+/* =========================
+   RESPONSIVO - NAV + FAB + DRAWER
+   ========================= */
 
-/* PC (Bootstrap lg ~ 992px) */
-@media (min-width: 992px){
-  .fz-products-grid{
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: 16px;
+@media (max-width: 992px){
+  /* Navbar: evita estourar */
+  .fz-navbar .navbar-brand span{
+    font-size: 1rem;
+    line-height: 1.1;
+    max-width: 60vw;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
-}
 
-/* Ajustes de card para não estourar */
-.fz-product-card{
-  border-radius: 18px;
-  overflow: hidden;
-}
+  /* Logo: limita no mobile */
+  .fz-logo{
+    max-height: 38px;
+    width: auto;
+    padding: 6px 12px;
+  }
 
-.fz-product-card img{
-  width: 100%;
-  height: 140px;
-  object-fit: cover;
-  display: block;
-}
+  /* Botões à direita: deixa quebrar */
+  .fz-navbar .navbar-collapse .d-flex{
+    flex-wrap: wrap;
+    gap: .5rem !important;
+  }
 
-/* (duplicado no seu original, mantive funcionando) */
-.fz-product-img{
-  width: 100%;
-  height: 140px;
-  object-fit: cover;
-  display: block;
-}
+  .fz-navbar .btn{
+    padding: .35rem .6rem;
+    font-size: .9rem;
+  }
 
-.fz-script {
-  font-family: 'Great Vibes', cursive;
-  letter-spacing: 1px;
-}
-
-.fz-banner-text {
-  font-family: 'Great Vibes', cursive;
-  font-size: 3rem;
-  line-height: 1.1;
+  .fz-chip{
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 }
 
 @media (max-width: 768px){
-  .fz-banner-text{
-    font-size: 2.2rem;
+  /* Texto do banner */
+  .fz-banner-text{ font-size: 2.2rem; }
+
+  /* Dá espaço pros FABs */
+  .fz-main{ padding-bottom: 96px; }
+
+  /* FABs no mobile ficam do MESMO lado (direita) pra não poluir */
+  .fz-fab-whats{
+    left: auto;      /* remove o left do desktop */
+    right: 14px;
+    bottom: 86px;
   }
 
+  .fz-fab-cart{
+    right: 14px;
+    bottom: 18px;
+  }
+
+  /* Badge menor */
+  .fz-badge{
+    width: 20px;
+    height: 20px;
+    font-size: .75rem;
+  }
+
+  /* Drawer: ocupa mais tela e fica confortável */
+  .fz-cart-drawer{
+    width: 100vw;
+    max-width: 100vw;
+    border-radius: 16px 0 0 16px; /* coerente com drawer lateral */
+  }
+
+  .fz-cart-header, .fz-cart-footer{ padding: 14px; }
+  .fz-cart-body{ padding: 12px; }
+
+  /* Footer centraliza */
+  .fz-footer .container{ text-align: center; }
 }
-/* ===== FIX BANNER MOBILE (não ultrapassar) ===== */
-.fz-hero,
-.hero-banner,
-.fz-banner,
-.banner-hero {
-  width: 100%;
-  max-width: 100%;
-  overflow: hidden;
-  border-radius: 24px;
+/* ===== Banner do meio: mostrar a imagem inteira no celular ===== */
+@media (max-width: 768px){
+  .fz-hero{
+    background-size: contain !important;   /* mostra inteira */
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    background-color: #0f1115;            /* fundo nas bordas */
+    height: auto !important;
+    min-height: 240px !important;
+  }
+
+  /* se o texto do banner estiver muito “alto”, diminui padding */
+  .fz-hero .content{
+    padding: 22px 16px !important;
+  }
 }
 
-/* Altura responsiva do banner */
-.fz-hero,
-.hero-banner,
-.fz-banner,
-.banner-hero {
-  min-height: 220px;
-  height: clamp(220px, 40vw, 520px); /* celular -> menor / desktop -> maior */
-}
+/* ==============================
+   FIX BANNER MOBILE (imagem inteira SEM SUMIR)
+   Cole NO FIM do arquivo
+   ============================== */
 
-/* Se o banner tem imagem de fundo */
-.fz-hero,
-.hero-banner,
-.fz-banner,
-.banner-hero {
-  background-size: cover;
-  background-position: center;
-}
+@media (max-width: 768px){
 
-/* Texto do banner: nunca estoura */
-.fz-banner-text,
-.hero-title,
-.banner-title {
-  font-size: clamp(26px, 6vw, 56px);
-  line-height: 1.05;
-  word-break: break-word;
-  overflow-wrap: anywhere;
-  margin: 0;
-}
+  /* Banner por background (div) */
+  .fz-hero,
+  .hero-full,
+  .hero-banner,
+  .fz-banner,
+  .banner-hero{
+    /* Mantém área visível (não deixa altura virar 0) */
+    min-height: 240px !important;
+    height: clamp(240px, 52vw, 420px) !important;
 
-/* Botões/itens dentro do banner não saírem da área */
-.fz-hero * ,
-.hero-banner * ,
-.fz-banner * ,
-.banner-hero * {
-  max-width: 100%;
+    /* Mostra a imagem inteira */
+    background-size: contain !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+
+    /* Preenche as faixas que sobram */
+    background-color: #0f1115 !important;
+  }
+
+  /* Se o banner do meio for IMG (não background) */
+  .fz-hero img,
+  .hero-full img,
+  .hero-banner img,
+  .fz-banner img,
+  .banner-hero img{
+    width: 100% !important;
+    height: auto !important;
+    object-fit: contain !important;
+    display: block !important;
+  }
 }
