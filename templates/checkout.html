@@ -30,10 +30,8 @@
               <label class="form-label fw-bold">Forma de pagamento</label>
               <select name="forma_pagamento" class="form-select" id="formaPagamento" required onchange="toggleTroco()">
                 <option value="">Selecione</option>
-                <option value="stripe">Cartão online (Stripe)</option>
-                <option value="credito">Cartão crédito na entrega</option>
-                <option value="debito">Cartão débito na entrega</option>
-                <option value="pix">Pix na entrega</option>
+                <option value="stripe">Pagamento Online</option>
+                <option value="credito">Pagamento na Entrega</option>                
                 <option value="dinheiro">Dinheiro (informar troco)</option>
               </select>
               <div class="form-text">Se não configurar Stripe agora, escolha uma opção “na entrega”.</div>
@@ -92,4 +90,5 @@ function toggleTroco(){
   box.style.display = (sel.value === "dinheiro") ? "block" : "none";
 }
 </script>
+
 {% endblock %}
