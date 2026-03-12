@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Painel Admin | {{ restaurant_name }}</title>
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg" />
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body class="admin-page">
+    <div id="toastRoot" class="toast-root" aria-live="polite"></div>
+
+    <header class="admin-header shell">
+      <div>
+        <p class="section-kicker">Painel administrativo</p>
+        <h1>Fiorenza Control Center</h1>
+        <p class="muted">Gerencie cardápio, preços, categorias, bairros, pedidos e informações da loja.</p>
+      </div>
+      <div class="header-actions">
+        <a class="ghost-btn" href="/" target="_blank" rel="noopener noreferrer">Abrir site</a>
+        <button id="logoutBtn" class="ghost-btn hidden" type="button">Sair</button>
+      </div>
+    </header>
+
+    <main class="shell admin-layout">
+      <section id="loginView" class="auth-card glass-card">
+        <div>
+          <p class="section-kicker">Acesso seguro</p>
+          <h2>Entrar no painel</h2>
+          <p class="muted">
+            Use as credenciais administrativas para editar o site sem mexer no código.
+          </p>
+          <div class="info-banner">
+            <strong>Credenciais iniciais</strong>
+            <span>Usuário: <code>admin</code> | Senha: <code>fiorenza123</code></span>
+          </div>
+        </div>
+        <form id="loginForm" class="stack-gap auth-form">
+          <label>
+            <span>Usuário</span>
+            <input type="text" name="username" value="admin" required />
+          </label>
+          <label>
+            <span>Senha</span>
+            <input type="password" name="password" value="fiorenza123" required />
+          </label>
+          <button type="submit" class="primary-btn wide-btn">Entrar</button>
+        </form>
+      </section>
+
+      <section id="dashboardView" class="dashboard hidden">
+        <div class="stats-grid" id="statsGrid"></div>
+
+        <div class="tabs-bar" id="tabsBar">
+          <button class="tab-btn active" data-tab="tab-overview">Visão geral</button>
+          <button class="tab-btn" data-tab="tab-settings">Configurações</button>
+          <button class="tab-btn" data-tab="tab-categories">Categorias</button>
+          <button class="tab-btn" data-tab="tab-items">Itens</button>
+          <button class="tab-btn" data-tab="tab-neighborhoods">Bairros / Frete</button>
+          <button class="tab-btn" data-tab="tab-orders">Pedidos</button>
+          <button class="tab-btn" data-tab="tab-access">Acesso admin</button>
+        </div>
+
+        <div class="tab-content active" id="tab-overview">
+          <div class="two-column-grid">
+            <section class="glass-card panel-card">
+              <div class="section-head compact">
+                <div>
+                  <p class="section-kicker">Resumo da operação</p>
+                  <h3>Atalhos e status</h3>
+                </div>
+                <a class="ghost-btn" href="/api/admin/backup" target="_blank" rel="noopener noreferrer">Baixar backup JSON</a>
+              </div>
+              <div class="overview-list" id="overviewList"></div>
+            </section>
+            <section class="glass-card panel-card">
+              <div class="section-head compact">
+                <div>
+                  <p class="section-kicker">Últimos pedidos</p>
+                  <h3>Fila em andamento</h3>
+                </div>
+              </div>
+              <div id="pendingOrdersPreview" class="stack-gap"></div>
+            </section>
+          </div>
+        </div>
+
+        <div class="tab-content" id="tab-settings">
+          <section class="glass-card panel-card">
+            <div class="section-head compact">
+              <div>
+                <p class="section-kicker">Configurações gerais</p>
+                <h3>Dados da loja e visual</h3>
+              </div>
+            </div>
+            <form id="settingsForm" class="stack-gap">
+              <div class="form-grid three-cols">
+                <label>
+                  <span>Nome do restaurante</span>
+                  <input type="text" name="restaurant_name" />
+                </label>
+                <label>
+                  <span>Tagline</span>
+                  <input type="text" name="tagline" />
+                </label>
+                <label>
+                  <span>Cidade</span>
+                  <input type="text" name="city" />
+                </label>
+              </div>
+
+              <div class="form-grid three-cols">
+                <label>
+                  <span>Endereço</span>
+                  <input type="text" name="address" />
+                </label>
+                <label>
+                  <span>Telefone</span>
+                  <input type="text" name="phone" />
+                </label>
+                <label>
+                  <span>WhatsApp</span>
+                  <input type="text" name="whatsapp" />
+                </label>
+              </div>
+
+              <div class="form-grid three-cols">
+                <label>
+                  <span>Horário de funcionamento</span>
+                  <input type="text" name="opening_hours" />
+                </label>
+                <label>
+                  <span>Prazo de entrega</span>
+                  <input type="text" name="delivery_time" />
+                </label>
+                <label>
+                  <span>Prazo de retirada</span>
+                  <input type="text" name="pickup_time" />
+                </label>
+              </div>
+
+              <div class="form-grid three-cols">
+                <label>
+                  <span>Pedido mínimo</span>
+                  <input type="number" step="0.01" min="0" name="minimum_order" />
+                </label>
+                <label>
+                  <span>Frete grátis acima de</span>
+                  <input type="number" step="0.01" min="0" name="free_delivery_from" />
+                </label>
+                <label>
+                  <span>Taxa de serviço</span>
+                  <input type="number" step="0.01" min="0" name="service_fee" />
+                </label>
+              </div>
+
+              <div class="form-grid three-cols">
+                <label>
+                  <span>Título do banner</span>
+                  <input type="text" name="banner_title" />
+                </label>
+                <label>
+                  <span>Subtítulo do banner</span>
+                  <input type="text" name="banner_subtitle" />
+                </label>
+                <label>
+                  <span>Selo principal</span>
+                  <input type="text" name="hero_badge" />
+                </label>
+              </div>
+
+              <div class="form-grid three-cols">
+                <label>
+                  <span>Pix</span>
+                  <input type="text" name="pix_key" />
+                </label>
+                <label>
+                  <span>Instagram</span>
+                  <input type="text" name="instagram" />
+                </label>
+                <label>
+                  <span>Mensagem do rodapé</span>
+                  <input type="text" name="footer_note" />
+                </label>
+              </div>
+
+              <div class="form-grid four-cols">
+                <label>
+                  <span>Cor primária</span>
+                  <input type="color" name="primary_color" />
+                </label>
+                <label>
+                  <span>Cor secundária</span>
+                  <input type="color" name="secondary_color" />
+                </label>
+                <label>
+                  <span>Fundo</span>
+                  <input type="color" name="background_color" />
+                </label>
+                <label>
+                  <span>Texto</span>
+                  <input type="color" name="text_color" />
+                </label>
+              </div>
+
+              <div class="inline-checks">
+                <label class="switch-row">
+                  <input type="checkbox" name="delivery_enabled" />
+                  <span>Delivery ativo</span>
+                </label>
+                <label class="switch-row">
+                  <input type="checkbox" name="pickup_enabled" />
+                  <span>Retirada ativa</span>
+                </label>
+              </div>
+
+              <button type="submit" class="primary-btn">Salvar configurações</button>
+            </form>
+          </section>
+        </div>
+
+        <div class="tab-content" id="tab-categories">
+          <div class="two-column-grid">
+            <section class="glass-card panel-card">
+              <div class="section-head compact">
+                <div>
+                  <p class="section-kicker">Cadastro</p>
+                  <h3>Categoria</h3>
+                </div>
+              </div>
+              <form id="categoryForm" class="stack-gap">
+                <input type="hidden" name="id" />
+                <label>
+                  <span>Nome</span>
+                  <input type="text" name="name" required />
+                </label>
+                <label>
+                  <span>Descrição</span>
+                  <textarea name="description" rows="3"></textarea>
+                </label>
+                <div class="form-grid two-cols">
+                  <label>
+                    <span>Ordem</span>
+                    <input type="number" name="sort_order" min="0" value="0" />
+                  </label>
+                  <label class="switch-row align-end">
+                    <input type="checkbox" name="active" checked />
+                    <span>Categoria ativa</span>
+                  </label>
+                </div>
+                <div class="modal-actions left">
+                  <button type="submit" class="primary-btn">Salvar categoria</button>
+                  <button type="button" id="categoryResetBtn" class="ghost-btn">Limpar</button>
+                </div>
+              </form>
+            </section>
+            <section class="glass-card panel-card">
+              <div class="section-head compact">
+                <div>
+                  <p class="section-kicker">Lista</p>
+                  <h3>Categorias cadastradas</h3>
+                </div>
+              </div>
+              <div id="categoriesList" class="entity-list"></div>
+            </section>
+          </div>
+        </div>
+
+        <div class="tab-content" id="tab-items">
+          <div class="two-column-grid">
+            <section class="glass-card panel-card">
+              <div class="section-head compact">
+                <div>
+                  <p class="section-kicker">Cadastro</p>
+                  <h3>Item do cardápio</h3>
+                </div>
+              </div>
+              <form id="itemForm" class="stack-gap">
+                <input type="hidden" name="id" />
+                <div class="form-grid two-cols">
+                  <label>
+                    <span>Categoria</span>
+                    <select name="category_id" required id="itemCategorySelect"></select>
+                  </label>
+                  <label>
+                    <span>Nome</span>
+                    <input type="text" name="name" required />
+                  </label>
+                </div>
+                <label>
+                  <span>Descrição</span>
+                  <textarea name="description" rows="3"></textarea>
+                </label>
+                <div class="form-grid three-cols">
+                  <label>
+                    <span>Preço</span>
+                    <input type="number" step="0.01" min="0" name="price" required />
+                  </label>
+                  <label>
+                    <span>Tempo de preparo (min)</span>
+                    <input type="number" min="0" name="prep_time" value="30" />
+                  </label>
+                  <label>
+                    <span>Ordem</span>
+                    <input type="number" min="0" name="sort_order" value="0" />
+                  </label>
+                </div>
+                <label>
+                  <span>URL da imagem (opcional)</span>
+                  <input type="url" name="image_url" placeholder="https://..." />
+                </label>
+                <div class="inline-checks">
+                  <label class="switch-row">
+                    <input type="checkbox" name="featured" />
+                    <span>Item em destaque</span>
+                  </label>
+                  <label class="switch-row">
+                    <input type="checkbox" name="available" checked />
+                    <span>Disponível no site</span>
+                  </label>
+                </div>
+                <div class="modal-actions left">
+                  <button type="submit" class="primary-btn">Salvar item</button>
+                  <button type="button" id="itemResetBtn" class="ghost-btn">Limpar</button>
+                </div>
+              </form>
+            </section>
+            <section class="glass-card panel-card">
+              <div class="section-head compact">
+                <div>
+                  <p class="section-kicker">Lista</p>
+                  <h3>Itens cadastrados</h3>
+                </div>
+              </div>
+              <div id="itemsList" class="entity-list"></div>
+            </section>
+          </div>
+        </div>
+
+        <div class="tab-content" id="tab-neighborhoods">
+          <div class="two-column-grid">
+            <section class="glass-card panel-card">
+              <div class="section-head compact">
+                <div>
+                  <p class="section-kicker">Cadastro</p>
+                  <h3>Bairro e taxa de entrega</h3>
+                </div>
+              </div>
+              <form id="neighborhoodForm" class="stack-gap">
+                <input type="hidden" name="id" />
+                <label>
+                  <span>Nome do bairro</span>
+                  <input type="text" name="name" required />
+                </label>
+                <div class="form-grid three-cols">
+                  <label>
+                    <span>Taxa de entrega</span>
+                    <input type="number" step="0.01" min="0" name="fee" value="0" />
+                  </label>
+                  <label>
+                    <span>ETA (min)</span>
+                    <input type="number" min="0" name="eta_min" value="35" />
+                  </label>
+                  <label>
+                    <span>Pedido mínimo</span>
+                    <input type="number" step="0.01" min="0" name="minimum_order" value="0" />
+                  </label>
+                </div>
+                <label class="switch-row">
+                  <input type="checkbox" name="active" checked />
+                  <span>Bairro ativo para entrega</span>
+                </label>
+                <div class="modal-actions left">
+                  <button type="submit" class="primary-btn">Salvar bairro</button>
+                  <button type="button" id="neighborhoodResetBtn" class="ghost-btn">Limpar</button>
+                </div>
+              </form>
+            </section>
+            <section class="glass-card panel-card">
+              <div class="section-head compact">
+                <div>
+                  <p class="section-kicker">Lista</p>
+                  <h3>Bairros e fretes</h3>
+                </div>
+              </div>
+              <div id="neighborhoodsList" class="entity-list"></div>
+            </section>
+          </div>
+        </div>
+
+        <div class="tab-content" id="tab-orders">
+          <section class="glass-card panel-card">
+            <div class="section-head compact">
+              <div>
+                <p class="section-kicker">Gestão de pedidos</p>
+                <h3>Pedidos recentes</h3>
+              </div>
+            </div>
+            <div id="ordersList" class="orders-list"></div>
+          </section>
+        </div>
+
+        <div class="tab-content" id="tab-access">
+          <section class="glass-card panel-card narrow-card">
+            <div class="section-head compact">
+              <div>
+                <p class="section-kicker">Segurança</p>
+                <h3>Alterar acesso administrativo</h3>
+              </div>
+            </div>
+            <form id="credentialsForm" class="stack-gap">
+              <label>
+                <span>Novo usuário</span>
+                <input type="text" name="new_username" required />
+              </label>
+              <label>
+                <span>Nova senha</span>
+                <input type="password" name="new_password" placeholder="Deixe em branco para manter a atual" />
+              </label>
+              <label>
+                <span>Senha atual</span>
+                <input type="password" name="current_password" required />
+              </label>
+              <button type="submit" class="primary-btn">Atualizar acesso</button>
+            </form>
+          </section>
+        </div>
+      </section>
+    </main>
+
+    <script src="/static/admin.js" defer></script>
+  </body>
+</html>

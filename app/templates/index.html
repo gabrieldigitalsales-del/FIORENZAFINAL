@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ restaurant_name }}</title>
+    <meta
+      name="description"
+      content="Peça na Fiorenza - Pizzaria e Restaurante com carrinho, checkout online e entrega por bairro."
+    />
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg" />
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body class="public-page">
+    <div id="toastRoot" class="toast-root" aria-live="polite"></div>
+
+    <header class="site-header shell">
+      <div class="brand-block">
+        <div class="brand-mark">F</div>
+        <div>
+          <div class="eyebrow" id="heroBadge">Entrega rápida</div>
+          <h1 id="brandName">{{ restaurant_name }}</h1>
+          <p id="brandTagline" class="muted">Carregando cardápio...</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <a id="phoneLink" class="ghost-btn" href="tel:+553137718931">Ligar</a>
+        <a id="whatsLink" class="primary-btn" target="_blank" rel="noopener noreferrer" href="#">WhatsApp</a>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero shell">
+        <div class="hero-panel glass-card">
+          <div class="hero-copy">
+            <span class="status-pill" id="heroBadgeLarge">Entrega rápida</span>
+            <h2 id="bannerTitle">Seu jantar favorito, agora com checkout online</h2>
+            <p id="bannerSubtitle" class="muted">
+              Monte seu pedido, escolha retirada ou entrega e finalize em poucos cliques.
+            </p>
+            <div class="hero-meta">
+              <div class="meta-card">
+                <strong>Endereço</strong>
+                <span id="addressText">Av Getulio Vargas, 411</span>
+              </div>
+              <div class="meta-card">
+                <strong>Horário</strong>
+                <span id="hoursText">Todos os dias, 18h às 23h30</span>
+              </div>
+              <div class="meta-card">
+                <strong>Atendimento</strong>
+                <span id="deliveryTimeText">35-55 min</span>
+              </div>
+            </div>
+          </div>
+          <div class="hero-stats">
+            <div class="highlight-card">
+              <span>Entrega</span>
+              <strong id="deliveryMode">Delivery e retirada</strong>
+            </div>
+            <div class="highlight-card">
+              <span>Pedido mínimo</span>
+              <strong id="minimumOrder">R$ 25,00</strong>
+            </div>
+            <div class="highlight-card">
+              <span>Frete grátis</span>
+              <strong id="freeDeliveryFrom">Acima de R$ 120,00</strong>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="shell utilities-row">
+        <div class="search-box glass-card">
+          <input
+            type="search"
+            id="searchInput"
+            placeholder="Buscar pizzas, massas, bebidas..."
+            aria-label="Buscar no cardápio"
+          />
+        </div>
+        <div class="quick-chips" id="quickInfo"></div>
+      </section>
+
+      <section class="shell featured-section">
+        <div class="section-head">
+          <div>
+            <p class="section-kicker">Destaques da casa</p>
+            <h3>Os mais pedidos</h3>
+          </div>
+          <button type="button" class="ghost-btn" id="scrollToMenuBtn">Ver cardápio</button>
+        </div>
+        <div class="featured-grid" id="featuredGrid"></div>
+      </section>
+
+      <section class="shell menu-shell" id="menuSection">
+        <div class="menu-column">
+          <div class="section-head compact">
+            <div>
+              <p class="section-kicker">Cardápio digital</p>
+              <h3>Escolha seus itens</h3>
+            </div>
+          </div>
+          <div class="category-pills" id="categoryPills"></div>
+          <div class="menu-grid" id="menuGrid"></div>
+        </div>
+
+        <aside class="cart-column">
+          <div class="cart-card glass-card">
+            <div class="cart-head">
+              <div>
+                <p class="section-kicker">Seu pedido</p>
+                <h3>Carrinho</h3>
+              </div>
+              <span class="count-badge" id="cartCountBadge">0 itens</span>
+            </div>
+            <div id="cartEmpty" class="empty-state small">
+              <div class="empty-icon">🍕</div>
+              <p>Seu carrinho está vazio. Adicione itens para começar.</p>
+            </div>
+            <div id="cartItems" class="cart-items"></div>
+            <div class="cart-summary">
+              <div class="summary-row">
+                <span>Subtotal</span>
+                <strong id="subtotalValue">R$ 0,00</strong>
+              </div>
+              <div class="summary-row">
+                <span>Entrega</span>
+                <strong id="deliveryFeeValue">Calculado no checkout</strong>
+              </div>
+              <div class="summary-row total">
+                <span>Total estimado</span>
+                <strong id="totalEstimateValue">R$ 0,00</strong>
+              </div>
+            </div>
+            <button id="checkoutBtn" type="button" class="primary-btn wide-btn">Continuar para checkout</button>
+            <p class="mini-note">
+              O valor do frete depende do bairro selecionado e pode ser alterado pela administração.
+            </p>
+          </div>
+        </aside>
+      </section>
+    </main>
+
+    <button id="mobileCartButton" class="mobile-cart-btn" type="button">
+      <span id="mobileCartLabel">Carrinho vazio</span>
+      <strong id="mobileCartTotal">R$ 0,00</strong>
+    </button>
+
+    <footer class="site-footer shell">
+      <div>
+        <h4 id="footerRestaurantName">Fiorenza - Pizzaria e Restaurante</h4>
+        <p id="footerNote" class="muted">
+          Sabores artesanais, atendimento rápido e painel administrativo para você controlar tudo.
+        </p>
+      </div>
+      <div class="footer-grid">
+        <div>
+          <span class="footer-label">Endereço</span>
+          <strong id="footerAddress">Av Getulio Vargas, 411</strong>
+        </div>
+        <div>
+          <span class="footer-label">Telefone</span>
+          <strong id="footerPhone">31 3771 8931</strong>
+        </div>
+        <div>
+          <span class="footer-label">Instagram</span>
+          <strong id="footerInstagram">@fiorenza</strong>
+        </div>
+      </div>
+    </footer>
+
+    <div id="checkoutModal" class="modal hidden" aria-hidden="true">
+      <div class="modal-backdrop" data-close-modal="checkoutModal"></div>
+      <div class="modal-panel">
+        <div class="modal-head">
+          <div>
+            <p class="section-kicker">Finalizar pedido</p>
+            <h3>Checkout</h3>
+          </div>
+          <button class="icon-btn" type="button" data-close-modal="checkoutModal">✕</button>
+        </div>
+
+        <form id="checkoutForm" class="checkout-form">
+          <div class="form-grid two-cols">
+            <label>
+              <span>Nome do cliente</span>
+              <input type="text" name="customer_name" required />
+            </label>
+            <label>
+              <span>Telefone / WhatsApp</span>
+              <input type="text" name="phone" required />
+            </label>
+          </div>
+
+          <div class="form-grid two-cols">
+            <label>
+              <span>Como deseja receber?</span>
+              <select name="delivery_type" id="deliveryTypeSelect">
+                <option value="delivery">Entrega</option>
+                <option value="pickup">Retirada no balcão</option>
+              </select>
+            </label>
+            <label>
+              <span>Bairro</span>
+              <select name="neighborhood_id" id="neighborhoodSelect"></select>
+            </label>
+          </div>
+
+          <div id="addressFields" class="stack-gap">
+            <div class="form-grid two-cols">
+              <label>
+                <span>Rua / Avenida</span>
+                <input type="text" name="address_line" />
+              </label>
+              <label>
+                <span>Número</span>
+                <input type="text" name="address_number" />
+              </label>
+            </div>
+            <label>
+              <span>Complemento</span>
+              <input type="text" name="address_complement" placeholder="Apartamento, referência, bloco..." />
+            </label>
+          </div>
+
+          <div class="form-grid two-cols">
+            <label>
+              <span>Pagamento</span>
+              <select name="payment_method" id="paymentMethodSelect">
+                <option value="Pix">Pix</option>
+                <option value="Cartão">Cartão</option>
+                <option value="Dinheiro">Dinheiro</option>
+              </select>
+            </label>
+            <label id="changeForField">
+              <span>Troco para</span>
+              <input type="number" step="0.01" min="0" name="change_for" placeholder="0,00" />
+            </label>
+          </div>
+
+          <label>
+            <span>Observações</span>
+            <textarea name="notes" rows="3" placeholder="Sem cebola, ponto da massa, referência do endereço..."></textarea>
+          </label>
+
+          <div class="checkout-summary glass-card">
+            <div class="summary-row">
+              <span>Subtotal</span>
+              <strong id="checkoutSubtotal">R$ 0,00</strong>
+            </div>
+            <div class="summary-row">
+              <span>Entrega</span>
+              <strong id="checkoutDeliveryFee">R$ 0,00</strong>
+            </div>
+            <div class="summary-row" id="serviceFeeRow">
+              <span>Taxa de serviço</span>
+              <strong id="checkoutServiceFee">R$ 0,00</strong>
+            </div>
+            <div class="summary-row total">
+              <span>Total</span>
+              <strong id="checkoutTotal">R$ 0,00</strong>
+            </div>
+          </div>
+
+          <button type="submit" class="primary-btn wide-btn" id="submitOrderBtn">Confirmar pedido</button>
+        </form>
+      </div>
+    </div>
+
+    <div id="successModal" class="modal hidden" aria-hidden="true">
+      <div class="modal-backdrop" data-close-modal="successModal"></div>
+      <div class="modal-panel compact success-panel">
+        <div class="success-icon">✅</div>
+        <h3>Pedido enviado</h3>
+        <p id="successMessage">Seu pedido foi registrado com sucesso.</p>
+        <div class="success-summary" id="successSummary"></div>
+        <div class="modal-actions">
+          <a id="successWhatsappBtn" class="primary-btn wide-btn" href="#" target="_blank" rel="noopener noreferrer">
+            Enviar também no WhatsApp
+          </a>
+          <button class="ghost-btn wide-btn" type="button" data-close-modal="successModal">Fechar</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="/static/app.js" defer></script>
+  </body>
+</html>
